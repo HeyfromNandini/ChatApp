@@ -1,5 +1,6 @@
 package project.elite.chatapp.navigation
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,13 +35,14 @@ import project.elite.chatapp.signin.GoogleAuthUiClient
 import project.elite.chatapp.signin.SignInScreen
 import project.elite.chatapp.signin.SignInViewModel
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun MainNavigation(
     navController: NavHostController,
-    ) {
-        val context = LocalContext.current
+) {
+    val context = LocalContext.current
 
-     val googleAuthUiClient by lazy {
+    val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = context.applicationContext,
             oneTapClient = Identity.getSignInClient(context.applicationContext)
@@ -48,126 +50,102 @@ fun MainNavigation(
     }
     val coroutineScope = rememberCoroutineScope()
 
-        NavHost(
-            navController = navController,
-            startDestination = "sign_in",
-//        startDestination = Screens.MainHomeScreen.route,
-        ) {
+    NavHost(
+        navController = navController,
+//        startDestination = "sign_in",
+        startDestination = Screens.StartScreen.route,
+    ) {
 
-            composable(
-                Screens.StartScreen.route,
-                exitTransition = {
-                    slideOutHorizontally(
-                        targetOffsetX = { -300 },
-                        animationSpec = tween(300)
-                    ) + fadeOut(animationSpec = tween(durationMillis = 300))
-                },
-                enterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { -300 },
-                        animationSpec = tween(durationMillis = 300)
-                    ) + fadeIn(animationSpec = tween(durationMillis = 300))
-                },
-                popEnterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { -300 },
-                        animationSpec = tween(durationMillis = 300)
-                    ) + fadeIn(animationSpec = tween(durationMillis = 300))
-                },
-                popExitTransition = {
-                    slideOutHorizontally(
-                        targetOffsetX = { -300 },
-                        animationSpec = tween(300)
-                    ) + fadeOut(animationSpec = tween(durationMillis = 300))
+        composable(
+            Screens.StartScreen.route,
+        ) {
+            StartScreen(navHostController = navController)
+        }
+
+
+        composable("sign_in") {
+            val viewModel = viewModel<SignInViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            LaunchedEffect(key1 = Unit) {
+                if (googleAuthUiClient.getSignedInUser() != null) {
+                    navController.navigate("profile")
                 }
-            ) {
-              StartScreen(navHostController = navController)
             }
 
-
-            composable("sign_in") {
-                val viewModel = viewModel<SignInViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
-
-                LaunchedEffect(key1 = Unit) {
-                    if(googleAuthUiClient.getSignedInUser() != null) {
-                        navController.navigate("profile")
-                    }
-                }
-
-                val launcher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartIntentSenderForResult(),
-                    onResult = { result ->
-                        if(result.resultCode == Activity.RESULT_OK) {
-                            coroutineScope.launch {
-                                val signInResult = googleAuthUiClient.signInWithIntent(
-                                    intent = result.data ?: return@launch
-                                )
-                                viewModel.onSignInResult(signInResult)
-                            }
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartIntentSenderForResult(),
+                onResult = { result ->
+                    if (result.resultCode == Activity.RESULT_OK) {
+                        coroutineScope.launch {
+                            val signInResult = googleAuthUiClient.signInWithIntent(
+                                intent = result.data ?: return@launch
+                            )
+                            viewModel.onSignInResult(signInResult)
                         }
                     }
-                )
+                }
+            )
 
-                LaunchedEffect(key1 = state.isSignInSuccessful) {
-                    if(state.isSignInSuccessful) {
+            LaunchedEffect(key1 = state.isSignInSuccessful) {
+                if (state.isSignInSuccessful) {
+                    Toast.makeText(
+                        context.applicationContext,
+                        "Sign in successful",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    navController.navigate("profile")
+                    viewModel.resetState()
+                }
+            }
+
+            SignInScreen(
+                state = state,
+                onSignInClick = {
+                    coroutineScope.launch {
+                        val signInIntentSender = googleAuthUiClient.signIn()
+                        launcher.launch(
+                            IntentSenderRequest.Builder(
+                                signInIntentSender ?: return@launch
+                            ).build()
+                        )
+                    }
+                }
+            )
+        }
+        composable("profile") {
+            ProfileScreen(
+                userData = googleAuthUiClient.getSignedInUser(),
+                onSignOut = {
+                    coroutineScope.launch {
+                        googleAuthUiClient.signOut()
                         Toast.makeText(
                             context.applicationContext,
-                            "Sign in successful",
+                            "Signed out",
                             Toast.LENGTH_LONG
                         ).show()
 
-                        navController.navigate("profile")
-                        viewModel.resetState()
+                        navController.popBackStack()
                     }
                 }
-
-                SignInScreen(
-                    state = state,
-                    onSignInClick = {
-                        coroutineScope.launch {
-                            val signInIntentSender = googleAuthUiClient.signIn()
-                            launcher.launch(
-                                IntentSenderRequest.Builder(
-                                    signInIntentSender ?: return@launch
-                                ).build()
-                            )
-                        }
-                    }
-                )
-            }
-            composable("profile") {
-                ProfileScreen(
-                    userData = googleAuthUiClient.getSignedInUser(),
-                    onSignOut = {
-                        coroutineScope.launch {
-                            googleAuthUiClient.signOut()
-                            Toast.makeText(
-                                context.applicationContext,
-                                "Signed out",
-                                Toast.LENGTH_LONG
-                            ).show()
-
-                            navController.popBackStack()
-                        }
-                    }
-                )
-            }
+            )
+        }
 
 
 
-            composable(Screens.HomeScreen.route) {
-                HomeScreen(navController= navController)
-            }
-            composable(Screens.ChatScreen.route) {
-                ChatScreen(navController= navController)
-            }
-            composable(Screens.StartScreen.route) {
-                StartScreen(navHostController = navController)
-            }
-            composable(Screens.SplashScreen.route) {
-               SplashScreen(navController = navController)
-            }
+        composable(Screens.HomeScreen.route) {
+            HomeScreen(navController = navController)
+        }
+        composable(Screens.ChatScreen.route) {
+            ChatScreen(navController = navController)
+        }
+        composable(Screens.StartScreen.route) {
+            StartScreen(navHostController = navController)
+        }
+        composable(Screens.SplashScreen.route) {
+            SplashScreen(navController = navController)
+        }
 
     }
 
