@@ -15,3 +15,7 @@ sealed class Screens(val route: String) {
     object  SignInScreen : Screens("si")
 
 }
+
+sealed class Collections(val name: String) {
+    object AllChats: Collections("AllChats")
+}

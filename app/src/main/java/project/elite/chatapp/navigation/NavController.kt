@@ -131,14 +131,11 @@ fun MainNavigation(
                 }
             )
         }
-
-
-
         composable(Screens.HomeScreen.route) {
             HomeScreen(navController = navController)
         }
         composable(Screens.ChatScreen.route) {
-            ChatScreen(navController = navController)
+            ChatScreen(navController = navController, userData = googleAuthUiClient.getSignedInUser())
         }
         composable(Screens.StartScreen.route) {
             StartScreen(navHostController = navController)
