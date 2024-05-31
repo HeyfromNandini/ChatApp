@@ -1,0 +1,51 @@
+<resources>
+
+
+    <string name="app_name">Chat app ui</string>
+    <string name="web_client_id">675487723517-jdduvgkqcma4i5kiv6vsdhnlc67v3c9k.apps.googleusercontent.com</string>
+
+
+
+
+    <string name="stay_with_your_friends">Stay connected with your friends and family</string>
+    <string name="secure_private_messaging">Secure, private messaging</string>
+    <string name="get_started">Get Started</string>
+    <string name="add_story">Add Story</string>
+    <string name="online">Online</string>
+    <string name="type_message">Type Message</string>
+    <string name="welcome_back">"Welcome back, "</string>
+    <string name="jayant">Jayant!</string>
+    <string name="okay">Okay</string>
+    <string name="_12_23_pm">12:23 PM</string>
+
+    <string name="search">Search</string>
+    <string name="chocolate_frappuccino">Chocolate Frappuccino</string>
+    <string name="_20_00">$20.00</string>
+    <string name="see_all">See All</string>
+    <string name="popular">Popular</string>
+    <string name="our_way_of_loving_you_back">Our way of loving\nyou back</string>
+    <string name="lorem_ipsum_dolor_sit_amet_consectetur_adipiscing_elit_etiam_at_mi_vitae_augue_feugiat_scelerisque_in_a_eros">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam at mi vitae augue feugiat scelerisque in a eros.</string>
+    <string name="add_to_bag">Add to bag</string>
+    <string name="coffee">Coffee</string>
+    <string name="chocolate_cappuccino">Chocolate Cappuccino</string>
+    <string name="_4_5">4.5</string>
+
+    <string name="categories">Categories</string>
+    <string name="placeholder">Chair, desk, lamp etc</string>
+    <string name="heading_text">Explore What\nYour Home Needs</string>
+    <string name="rooms">Rooms</string>
+    <string name="room_des">Furniture for every corners in your home</string>
+    <string name="product_name">Jan Sflanaganvik sofa</string>
+    <string name="add_to_ba">Add to bag</string>
+    <string name="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc consectetur velit at massa vehicula, quis fringilla urna gravida.</string>
+    <string name="recommend_products">Sofa you might like</string>
+    <string name="proceed_to_checkout">Proceed to checkout</string>
+    <string name="my_shoping_bag">My Shopping Bag</string>
+    <string name="_599">$599</string>
+    <string name="_5_0">5.0</string>
+    <string name="_98_reviews">98 Reviews</string>
+    <string name="total">Total</string>
+    <string name="_600">$600</string>
+
+
+</resources>
