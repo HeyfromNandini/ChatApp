@@ -1,7 +1,14 @@
+
+
 buildscript {
-    dependencies {
-        classpath("com.google.gms:google-services:4.4.2")
+
+    dependencies{
+        var hilt_version = "2.39.1"
+        classpath ("com.google.gms:google-services:4.3.13")
+        classpath ("com.google.dagger:hilt-android-gradle-plugin:$hilt_version")
     }
+
+
 }
 
 plugins {

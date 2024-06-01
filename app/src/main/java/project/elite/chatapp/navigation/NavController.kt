@@ -14,8 +14,12 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +31,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
+import project.elite.chatapp.datastore.UserDatastore
 import project.elite.chatapp.profile.ProfileScreen
 import project.elite.chatapp.screens.ChatScreen
 import project.elite.chatapp.screens.HomeScreen
@@ -34,6 +39,7 @@ import project.elite.chatapp.screens.StartScreen
 import project.elite.chatapp.signin.GoogleAuthUiClient
 import project.elite.chatapp.signin.SignInScreen
 import project.elite.chatapp.signin.SignInViewModel
+import project.elite.chatapp.signin.UserData
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
@@ -41,6 +47,16 @@ fun MainNavigation(
     navController: NavHostController,
 ) {
     val context = LocalContext.current
+    val datastore = UserDatastore(context)
+    val name = datastore.getName.collectAsState(initial = "")
+    val isLoggedIn = datastore.getLoginStatus.collectAsState(initial = false)
+    var userData by remember {
+        mutableStateOf<UserData?>(null)
+    }
+
+    LaunchedEffect(key1 = isLoggedIn.value) {
+        userData = UserData(userId = "ABC123", username = name.value, profilePictureUrl = null)
+    }
 
     val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
@@ -53,9 +69,8 @@ fun MainNavigation(
     NavHost(
         navController = navController,
 //        startDestination = "sign_in",
-        startDestination = Screens.StartScreen.route,
+        startDestination = Screens.SplashScreen.route,
     ) {
-
         composable(
             Screens.StartScreen.route,
         ) {
@@ -132,9 +147,11 @@ fun MainNavigation(
             )
         }
         composable(Screens.HomeScreen.route) {
-            HomeScreen(navController = navController)
+            println("UserData is ${googleAuthUiClient.getSignedInUser()}")
+            HomeScreen(navController = navController, userData = userData)
         }
         composable(Screens.ChatScreen.route) {
+            println("UserDataSS is ${googleAuthUiClient.getSignedInUser()}")
             ChatScreen(navController = navController, userData = googleAuthUiClient.getSignedInUser())
         }
         composable(Screens.StartScreen.route) {

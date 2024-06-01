@@ -66,7 +66,7 @@ fun StartScreen(
                 .align(Alignment.BottomCenter)
                 .height(60.dp)
         ) {
-            navHostController.navigate(Screens.HomeScreen.route)
+            navHostController.navigate("sign_in")
         }
     }
 }

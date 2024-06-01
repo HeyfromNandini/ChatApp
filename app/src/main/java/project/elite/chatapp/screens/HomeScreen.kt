@@ -27,6 +27,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +37,7 @@ import project.elite.chatapp.R
 import project.elite.chatapp.data.Person
 import project.elite.chatapp.data.personList
 import project.elite.chatapp.navigation.Screens
+import project.elite.chatapp.signin.UserData
 import project.elite.chatapp.ui.theme.DarkGray
 import project.elite.chatapp.ui.theme.Gray
 import project.elite.chatapp.ui.theme.Gray400
@@ -44,6 +46,7 @@ import project.elite.chatapp.ui.theme.Yellow
 
 @Composable
 fun HomeScreen(
+    userData: UserData?,
     navController: NavController
 ) {
 
@@ -58,7 +61,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(top = 30.dp)
         ) {
-            HeaderOrViewStory()
+            HeaderOrViewStory(userData)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -94,13 +97,13 @@ fun HomeScreen(
 }
 
 @Composable
-fun HeaderOrViewStory() {
+fun HeaderOrViewStory(userData: UserData?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, top = 20.dp)
     ) {
-        Header()
+        Header(userData = userData)
         ViewStoryLayout()
     }
 }
@@ -255,7 +258,7 @@ fun AddStoryLayout(
 }
 
 @Composable
-fun Header() {
+fun Header(userData: UserData?) {
 
     val annotatedString = buildAnnotatedString {
         withStyle(
@@ -267,20 +270,28 @@ fun Header() {
         ) {
             append(stringResource(R.string.welcome_back))
         }
-        withStyle(
-            style = SpanStyle(
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-            )
-        ) {
-            append(stringResource(R.string.jayant))
+        userData?.username?.let { username ->
+            withStyle(
+                style = SpanStyle(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+            ) {
+                append(" $username")
+            }
         }
     }
 
-    Text(text = annotatedString)
-
+    Text(
+        text = annotatedString,
+        textAlign = TextAlign.Center,
+        fontSize = 26.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = Color.White
+    )
 }
+
 
 @SuppressLint("UnnecessaryComposedModifier", "UnrememberedMutableInteractionSource")
 fun Modifier.noRippleEffect(onClick: () -> Unit) = composed {

@@ -29,6 +29,7 @@ import project.elite.chatapp.profile.ProfileScreen
 import project.elite.chatapp.signin.GoogleAuthUiClient
 import project.elite.chatapp.signin.SignInScreen
 import project.elite.chatapp.signin.SignInViewModel
+import project.elite.chatapp.signin.phonesignin.LoginDialog
 import project.elite.chatapp.ui.theme.ChatAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +54,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     MainNavigation(navController = navController)
 
+//                    LoginDialog()
                 }
             }
         }
