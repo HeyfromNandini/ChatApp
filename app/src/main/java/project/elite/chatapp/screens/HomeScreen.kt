@@ -17,6 +17,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.TopCenter
@@ -34,9 +38,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.jet.firestore.JetFirestore
+import com.jet.firestore.getListOfObjects
 import project.elite.chatapp.R
+import project.elite.chatapp.data.AllChats
 import project.elite.chatapp.data.Person
+import project.elite.chatapp.data.UserInfo
 import project.elite.chatapp.data.personList
+import project.elite.chatapp.navigation.Collections
 import project.elite.chatapp.navigation.Screens
 import project.elite.chatapp.signin.UserData
 import project.elite.chatapp.ui.theme.DarkGray
@@ -44,6 +53,7 @@ import project.elite.chatapp.ui.theme.Gray
 import project.elite.chatapp.ui.theme.Gray400
 import project.elite.chatapp.ui.theme.Line
 import project.elite.chatapp.ui.theme.Yellow
+import kotlin.random.Random
 
 @Composable
 fun HomeScreen(
@@ -51,79 +61,87 @@ fun HomeScreen(
     navController: NavController
 ) {
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
+    var allUsers by remember { mutableStateOf<List<Person>?>(null) }
 
-        Button(onClick = {
-            navController.navigate(Screens.ChatScreen.route)
-        }) {
-            Text("Navigate to Chats Screen")
-
-        }
-
-        Column(
+    JetFirestore(path = {
+        collection(Collections.AllChats.name)
+    }, onRealtimeCollectionFetch = { values, _ ->
+        allUsers = values?.getListOfObjects()
+    }) {
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 30.dp)
+                .background(Color.Black)
         ) {
-            HeaderOrViewStory(userData)
-            Box(
+
+            Button(onClick = {
+                navController.navigate(Screens.ChatScreen.route)
+            }) {
+                Text("Navigate to Chats Screen")
+
+            }
+
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        Color.White, RoundedCornerShape(
-                            topStart = 30.dp, topEnd = 30.dp
-                        )
-                    )
+                    .padding(top = 30.dp)
             ) {
-                BottomSheetSwipeUp(
+                HeaderOrViewStory(userData)
+                Box(
                     modifier = Modifier
-                        .align(TopCenter)
-                        .padding(top = 15.dp)
-                )
-                LazyColumn(
-                    modifier = Modifier.padding(bottom = 15.dp, top = 30.dp)
-                ) {
-                    items(personList, key = { it.id }) {
-                        UserEachRow(person = it) {
-                            navController.currentBackStackEntry?.savedStateHandle?.set(
-                                "data",
-                                it
+                        .fillMaxSize()
+                        .background(
+                            Color.White, RoundedCornerShape(
+                                topStart = 30.dp, topEnd = 30.dp
                             )
-                            navController.navigate(Screens.ChatScreen.route)
+                        )
+                ) {
+                    BottomSheetSwipeUp(
+                        modifier = Modifier
+                            .align(TopCenter)
+                            .padding(top = 15.dp)
+                    )
+                    LazyColumn(
+                        modifier = Modifier.padding(bottom = 15.dp, top = 30.dp)
+                    ) {
+                        items(allUsers ?: emptyList()) {userInfo ->
+                            UserEachRow(person = userInfo) {
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    "data",
+                                    it
+                                )
+                                navController.navigate(Screens.ChatScreen.route)
+                            }
                         }
                     }
                 }
             }
-        }
 
+        }
     }
 
 }
 
 @Composable
-fun HeaderOrViewStory(userData: UserData?) {
+fun HeaderOrViewStory(userData: UserData?, personList: List<Person>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, top = 20.dp)
     ) {
         Header(userData = userData)
-        ViewStoryLayout()
+        ViewStoryLayout(personList = personList)
     }
 }
 
 @Composable
-fun ViewStoryLayout() {
+fun ViewStoryLayout(personList: List<Person>) {
     LazyRow(modifier = Modifier.padding(vertical = 20.dp)) {
         item {
             AddStoryLayout()
             SpacerWidth()
         }
-        items(personList, key = { it.id }) {
+        items(personList) {
             UserStory(person = it)
         }
     }

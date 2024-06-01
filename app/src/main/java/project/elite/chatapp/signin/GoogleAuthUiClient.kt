@@ -46,7 +46,7 @@ class GoogleAuthUiClient(
                 context,
                 user?.email ?: "",
                 name = user?.displayName ?: "",
-                pfp = null
+                pfp = user?.photoUrl?.toString()
 
             )
             dataStore.saveName(user?.displayName ?: "")
