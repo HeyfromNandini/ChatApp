@@ -12,6 +12,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 import project.elite.chatapp.R
 import project.elite.chatapp.datastore.UserDatastore
+import project.elite.chatapp.firestore.updateUserInfoToFirebase
 
 
 class GoogleAuthUiClient(
@@ -33,12 +34,21 @@ class GoogleAuthUiClient(
         return result?.pendingIntent?.intentSender
     }
 
+
+
     suspend fun signInWithIntent(intent: Intent): SignInResult {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
+            updateUserInfoToFirebase(
+                context,
+                user?.email ?: "",
+                name = user?.displayName ?: "",
+                pfp = null
+
+            )
             dataStore.saveName(user?.displayName ?: "")
             dataStore.saveNumber(user?.phoneNumber ?: "")
             dataStore.saveLoginStatus(status = true)

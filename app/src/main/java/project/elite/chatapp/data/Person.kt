@@ -5,6 +5,13 @@ import android.os.Parcel
 import android.os.Parcelable
 import project.elite.chatapp.R
 
+data class UserInfo(
+    val email: String,
+    val name: String,
+    val pfp: String?
+) {
+    constructor() : this("", "", null)
+}
 
 data class Person(
     val id: Int = 0,

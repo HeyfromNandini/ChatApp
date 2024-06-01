@@ -18,4 +18,5 @@ sealed class Screens(val route: String) {
 
 sealed class Collections(val name: String) {
     object AllChats: Collections("AllChats")
+    object UserInfo: Collections("UserInfo")
 }
